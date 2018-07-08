@@ -27,7 +27,7 @@ public interface Closeable extends AutoCloseable {
 如下代码读取文件的第一行，其中 BufferedReader 就是一个需要被关闭的对象。（FileReader呢?需要显式关闭吗？）
 此处即使br.readLine()抛出异常，BufferedReader 实例对象也会正确关闭。
 
-```
+```java
 static String readFirstLineFromFile(String path) throws IOException {
     try (BufferedReader br = new BufferedReader(new FileReader(path))) {
         return br.readLine();
