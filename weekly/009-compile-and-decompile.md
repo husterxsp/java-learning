@@ -230,10 +230,10 @@ public class Hello {
 
 #### 如何防止反编译
 
-隔离Java程序：让用户接触不到你的Class文件
-对Class文件进行加密：提到破解难度
-代码混淆：将代码转换成功能上等价，但是难于阅读和理解的形式
-转换成本地代码
+- 隔离Java程序：让用户接触不到你的Class文件
+- 对Class文件进行加密：提到破解难度
+- 代码混淆：将代码转换成功能上等价，但是难于阅读和理解的形式
+- 转换成本地代码
 
 参考： http://it4j.iteye.com/blog/2157422
 
@@ -253,7 +253,26 @@ switch(string) 会先比较 hashcode，如果 hashcode 相等，还要用 equals
 
 https://docs.oracle.com/javase/tutorial/java/data/strings.html
 
-在java中，string对象是不可变的。一些操作改变string对象的方法其实只是创建了新的string对象返回。以以下代码为例：
+在java中，string对象是不可变的。一些操作改变string对象的方法其实只是创建了新的string对象返回。
+
+为什么String对象不可变？看下源代码：
+
+```java
+// JDK 10
+// String.java
+public final class String implements java.io.Serializable, Comparable<String>, CharSequence {
+    private final byte[] value;
+}
+```
+
+如上所示，java 的 String 其实是对 字节数组 (jdk8还是字符数组 char value[]...) 的封装，而且这个value是final修饰的，所以 一旦初始化后，value不可变，所以String对象不可变。
+
+一些改变字符串值的方法，如replace, 其实是通过 `new String()` 创建了一个新的字符串对象并赋值给这个引用。需要注意，`String a = "Hello";` 这句代码中，变量 a 只是某个字符串对象的引用，所以通过这些方法或者直接给a重新赋值，改变的只是这个变量 a 的引用。
+
+
+
+
+再看下 String 的 "+"：
 
 ```java
 // Hello.java
@@ -296,44 +315,62 @@ final String a1 = "hello";
 String b1 = "hello2";
 String c1 = a1 + 2;
 System.out.println(b1 == c1); // true
+System.out.println(b1.equals(c1)); // true
 
 String a2 = "hello";
 String b2 = "hello2";
 String c2 = a2 + 2;
 System.out.println(b2 == c2); // false
+System.out.println(b2.equals(c2)); // true
 ```
 
 先看下反编译结果:
 
 ```java
-/*
- * Decompiled with CFR 0_132.
- */
-package test;
+String string = "hello2";
+String string2 = "hello2";
+System.out.println(string == string2);
+System.out.println(string.equals(string2));
+String string3 = "hello";
+String string4 = "hello2";
 
-import java.io.PrintStream;
+// JDK 8
+String string5 = new StringBuilder().append(string3).append(2).toString();
+System.out.println(string4 == string5);
 
-public class Hello {
-    public static void main(String[] arrstring) {
-        String string = "hello2";
-        String string2 = "hello2";
-        System.out.println(string == string2);
-        String string3 = "hello";
-        String string4 = "hello2";
-        String string5 = new StringBuilder().append(string3).append(2).toString();
-        System.out.println(string4 == string5);
-    }
-}
+// JDK 10
+CallSite callSite = StringConcatFactory.makeConcatWithConstants(new Object[]{"\u00012"}, string3);
+System.out.println(string4 == callSite);
+
+System.out.println(string4.equals(callSite));
 ```
 
-可以看到，因为 a1 是final修饰的，所以编译器直接将 a1 出现的地方替换为 "hello" 了，第一个判断直接 是 true。
-而 c2 处的 "+" 则是调用了 StringBuilder 创建了新的 string 对象，所以是false。
+因为 a1 是final修饰的，所以 a1 (引用)不可变，所以因为 "编译时优化"，编译时会直接计算 "+" 两边的常量，所以编译后 `c1 = "hello2"` , 并且 a1已经被删掉了。
+
+java中有两种方式创建字符串：
+
+- 字面量方式创建字符串：`String name = "tom";`
+- new关键字创建字符串：`String name2 = new String("jerry");`
+
+Java中的String pool(字符串常量池)是java堆内存(heap memory)中的存储字符串的一块区域。
+
+1.当使用字面量的方式创建字符串时,虚拟机会检查字符串池中的字符串，如果有相同的字符串，那么并不会为新的字符串分配内存空间，而是令它指向字符串常量池中已经存在的那个字符串。这样做的好处是节省了内存的消耗。
+注意使用字面量的方式创建的字符串是存储在字符串常量池中的。
+
+2.使用new关键字创建的字符串不存储在字符串常量池中，而是直接在堆内存中。
+
+因而，再回到上面的代码，执行 `String b1 = "hello2";` 时在常量池创建的 "hello2" 对象，在 执行 `c1 = "hello2"`, 直接将 c1 指向常量池中的对象，所以 b1 和 c1 指向的内存地址相同。 （注意 `==` 比较的是引用，即地址。equals() 方法则是比较的是字符串的值。）
+
+
+而 c2 处的 "+" 则是调用了 StringBuilder （jdk8, jdk10用的是StringConcatFactory）创建了新的 string 对象，所以是false。
 
 既然 string 是不可变的，那么final修饰有什么意义？
 final 修饰后，变量就不能重新赋值了。不用final的话，string对象可以重新赋值，只不过重新赋值的时候是创建一个新的对象返回。
 参考：https://stackoverflow.com/questions/10233309/does-it-make-sense-to-define-a-final-string-in-java
 
 关于 String pool, 参考: https://blog.csdn.net/dhassa/article/details/73075852
+为什么String是不可变的，参考：https://blog.csdn.net/csdn_aiyang/article/details/68942964
+java编译时优化，参考：https://blog.csdn.net/baidu_30809315/article/details/78737293
 
 #### lambda表达式
 
@@ -393,7 +430,7 @@ public class Hello {
 }
 ```
 
-##### java 10 的本地变量推断
+#### java 10 的本地变量推断
 
 http://www.hollischuang.com/archives/2064
 
