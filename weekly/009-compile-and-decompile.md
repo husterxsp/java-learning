@@ -360,7 +360,11 @@ Java中的String pool(字符串常量池)是java堆内存(heap memory)中的存�
 
 而 c2 处的 "+" 则是调用了 StringBuilder （jdk8, jdk10用的是StringConcatFactory）创建了新的 string 对象，所以 b2 和 c2指向的地址不同。
 
-既然 string 是不可变的，那么final修饰有什么意义？
+StringBuilder 对象和 String对象？
+
+StringBuilder是 可变的，它内部维护一个数组，一些修改它的方法是修改这个数组，。https://docs.oracle.com/javase/tutorial/java/data/buffers.html
+
+既然 string 是不可变的，那么一般final修饰有什么意义？
 
 final 修饰后，变量就不能重新赋值了，也即 string 变量对应的引用也不可变了。不用final的话，string对象可以重新赋值，只不过重新赋值的时候是创建一个新的对象返回，即改变了引用。
 参考：https://stackoverflow.com/questions/10233309/does-it-make-sense-to-define-a-final-string-in-java
