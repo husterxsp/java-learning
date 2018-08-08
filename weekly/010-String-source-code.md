@@ -2,11 +2,6 @@
 
 以下代码阅读基于 JDK8。基本上只考虑一些public 的方法。
 
-#### CharSequence
-
-源代码里好多地方用到了。
-
-
 #### 定义
 
 ```java
@@ -45,6 +40,15 @@ public int compareToIgnoreCase(String str) {}
 ```
 
 函数中先逐个比较是否有不同的字符，如果有不同的字符直接返回 `c1 - c2`。如果比较到最后都相等，则比较长度 `len1 - len2`。
+
+
+`CharSequence` 接口，也代表字符串，但是不要求不可变性。接口不可以实例化，这里可以通过 String, StringBuffer, StringBuilder 进行实例化。
+
+```java
+CharSequence charSequence = "hello";
+CharSequence charSequence = new StringBuffer("hello");
+CharSequence charSequence = new StringBuilder("hello");
+```
 
 #### 属性
 
@@ -306,10 +310,6 @@ public String replace(CharSequence target, CharSequence replacement) {
 - 如果 n 是负数，正则匹配会进行多次，结果数组可以任意长度。
 - 如果 n 是 0 ，正则匹配会进行多次，结果和负数相比只是删去了 数组末尾的 空字符 "" 。
 
- If the limit n is greater than zero then the pattern will be applied at most n - 1 times, the array's length will be no greater than n, and the array's last entry will contain all input beyond the last matched delimiter.
- If n is non  then the pattern will be applied as many times as possible and the array can have any length.
- If n is zero then the pattern will be applied as many times as possible, the array can have any length, and trailing empty strings will be discarded.
-
 ```java
 public String[] split(String regex, int limit) {}
 public String[] split(String regex) {
@@ -318,14 +318,14 @@ public String[] split(String regex) {
 ```
 
 以 "boo:and:foo", 为例，结果如下：
-
-:	2	{ "boo", "and:foo" }
-:	5	{ "boo", "and", "foo" }
-:	-2	{ "boo", "and", "foo" }
-o	5	{ "b", "", ":and:f", "", "" }
-o	-2	{ "b", "", ":and:f", "", "" }
-o	0	{ "b", "", ":and:f" }
-
+regex | limit  | result
+--- | --- | ---
+:	| 2	| { "boo", "and:foo" }
+:	| 5	| { "boo", "and", "foo" }
+:	| -2| { "boo", "and", "foo" }
+o	| 5	| { "b", "", ":and:f", "", "" }
+o	| -2| { "b", "", ":and:f", "", "" }
+o	| 0	| { "b", "", ":and:f" }
 
 字符串通过给定的分隔符，进行拼接
 
@@ -415,6 +415,9 @@ public static String copyValueOf(char data[], int offset, int count) {
 public static String copyValueOf(char data[]) {
     return new String(data);
 }
+```
+
+```java
 public static String valueOf(boolean b) {
     return b ? "true" : "false";
 }
@@ -438,12 +441,33 @@ public static String valueOf(double d) {
 
 #### intern() 方法
 
+执行 intern() 的时候会先检查字符串常量池中是否有对应的 字符串，如果有，则返回该地址，如果没有，则在常量池中创建该字符串，
+然后返回。
+
 ```
 public native String intern();
 ```
 
+例：
+```java
+String s = new String("abc");
+String s1 = "abc";
+String s2 = new String("abc");
+
+System.out.println(s == s1.intern()); // false
+System.out.println(s == s2.intern()); // false
+System.out.println(s1 == s2.intern());// true
+```
+
+初始化时，在堆内存创建了两个 "abc" 对象分别将地址赋给 s, s2, 同时在常量池创建了一个对象 "abc", 地址赋给了 s1。
+
+执行 intern() 会到常量池中找，所以在上述代码中, 其实 `s1.intern(), s2.intern()` 都指向了常量池中的 `s1`。
+
 ### 参考
 
 - http://www.hollischuang.com/archives/1330
-- https://www.baeldung.com/java-9-compact-string
 - https://docs.oracle.com/javase/8/docs/api/java/lang/String.html
+- https://www.cnblogs.com/wanlipeng/archive/2010/10/21/1857513.html
+- http://www.cnblogs.com/paddix/p/5326863.html
+- https://www.baeldung.com/java-char-sequence-string
+- https://www.baeldung.com/java-9-compact-string
