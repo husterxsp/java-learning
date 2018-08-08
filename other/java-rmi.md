@@ -1,5 +1,7 @@
 ### Java RMI (远程方法调用)
 
+它是一种机制，能够让在某个 Java 虚拟机上的对象调用另一个 Java 虚拟机中的对象上的方法。
+
 #### 1. 创建 远程对象 (Remote Object)
 
 1. 创建定义client/server 交流的接口(interface)
@@ -98,8 +100,8 @@ public class RMIClient {
 }
 ```
 
-
 参考:
 
 - http://www.baeldung.com/java-rmi
 - https://github.com/eugenp/tutorials/tree/master/java-rmi
+- https://blog.csdn.net/suifeng3051/article/details/48469523
