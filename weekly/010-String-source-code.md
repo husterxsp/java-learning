@@ -1,6 +1,6 @@
 ### 源码阅读-String
 
-以下代码阅读基于 JDK8。基本上只考虑一些public 的方法。
+以下代码阅读基于 JDK8。
 
 #### 定义
 
@@ -82,7 +82,7 @@ public int hashCode() {
 }
 ```
 
-`serialVersionUID` 是一个标识，主要用于反序列化。这里有用吗？
+`serialVersionUID` 是一个标识，主要用于反序列化。
 
 #### 构造函数
 
@@ -124,10 +124,37 @@ String(char[] value, boolean share) {
 ```
 这个 protected 的构造函数 和 `public String(char value[]) {}` 主要区别是没有 `Arrays.copyOf` 的过程了，效率更高一些。主要是包内部使用，一些函数中创建了一些字符数组后，这些数组没有其他的用途了，可以直接用来创建新的String对象。
 
-##### ？
+##### unicode 相关
 
 ```java
 public String(int[] codePoints, int offset, int count) {}
+```
+
+以上代码使用 unicode编码的整型数组来创建字符串。举例如下：
+
+```java
+String ustr = new String(new int[] {0x5b57, 0x7b26, 0x7f16, 0x7801}, 0, 4);  // "字符编码"(\u5b57是'字'的unicode编码)。0表示起始位置，4表示长度。
+System.out.printf("ustr=%s\n", ustr); //ustr=字符编码
+
+// 其他相关的 API：
+//  获取位置0的元素对应的unciode编码
+System.out.printf("%-30s = 0x%x\n", "ustr.codePointAt(0)", ustr.codePointAt(0));
+
+// 获取位置2之前的元素对应的unciode编码
+System.out.printf("%-30s = 0x%x\n", "ustr.codePointBefore(2)", ustr.codePointBefore(2));
+
+// 获取位置1开始偏移2个代码点的索引
+System.out.printf("%-30s = %d\n", "ustr.offsetByCodePoints(1, 2)", ustr.offsetByCodePoints(1, 2));
+
+// 获取第0~3个元素之间的unciode编码的个数
+System.out.printf("%-30s = %d\n", "ustr.codePointCount(0, 3)", ustr.codePointCount(0, 3));
+
+// 结果：
+// ustr=字符编码
+// ustr.codePointAt(0)            = 0x5b57
+// ustr.codePointBefore(2)        = 0x7b26
+// ustr.offsetByCodePoints(1, 2)  = 3
+// ustr.codePointCount(0, 3)      = 3
 ```
 
 ##### 使用字节数组构造
@@ -318,6 +345,7 @@ public String[] split(String regex) {
 ```
 
 以 "boo:and:foo", 为例，结果如下：
+
 regex | limit  | result
 --- | --- | ---
 :	| 2	| { "boo", "and:foo" }
@@ -471,3 +499,4 @@ System.out.println(s1 == s2.intern());// true
 - http://www.cnblogs.com/paddix/p/5326863.html
 - https://www.baeldung.com/java-char-sequence-string
 - https://www.baeldung.com/java-9-compact-string
+- https://wangkuiwu.github.io/2012/04/11/charsequence/
