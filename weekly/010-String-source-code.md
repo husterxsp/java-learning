@@ -74,6 +74,13 @@ public int hashCode() {
     return h;
 }
 ```
+计算方式 `s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]`。 为啥这么算？参考 《Effective java》第三章 第9条。
+一个好的散列函数倾向于 “为不相等的对象产生不相等的散列码”。
+31 有个很好的特性，即用以为和减法来代替乘法，可以得到更好的性能。`31*i == (i<<5)-i`。java虚拟机可以自动完成这种优化。
+
+[为什么用偶数会导致信息丢失？](https://www.zhihu.com/question/24381016/answer/112861010)
+
+这里为啥要执行 `char val[] = value;` 对value再进行一次拷贝呢？
 
 `serialVersionUID` 是一个标识，主要用于反序列化。
 
@@ -508,3 +515,4 @@ System.out.println(str2 == str1);
 - https://www.baeldung.com/java-char-sequence-string
 - https://www.baeldung.com/java-9-compact-string
 - https://wangkuiwu.github.io/2012/04/11/charsequence/
+- https://blog.csdn.net/claram/article/details/53770830
