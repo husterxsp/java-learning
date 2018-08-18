@@ -41,14 +41,7 @@ public int compareToIgnoreCase(String str) {}
 
 函数中先逐个比较是否有不同的字符，如果有不同的字符直接返回 `c1 - c2`。如果比较到最后都相等，则比较长度 `len1 - len2`。
 
-
-`CharSequence` 接口，也代表字符串，但是不要求不可变性。接口不可以实例化，这里可以通过 String, StringBuffer, StringBuilder 进行实例化。
-
-```java
-CharSequence charSequence = "hello";
-CharSequence charSequence = new StringBuffer("hello");
-CharSequence charSequence = new StringBuilder("hello");
-```
+`CharSequence` 接口，即字符串序列。String, StringBuffer, StringBuilder 都实现了该接口。
 
 #### 属性
 
@@ -211,7 +204,7 @@ public void getChars(int srcBegin, int srcEnd, char dst[], int dstBegin) {
     }
     System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
 }
-// 返回字节数组 不是很懂
+// 根据字符编码 返回字节数组
 public byte[] getBytes(String charsetName){}
 public byte[] getBytes(Charset charset) {}
 
@@ -371,7 +364,6 @@ public static String join(CharSequence delimiter, CharSequence... elements) {}
 public static String join(CharSequence delimiter, Iterable<? extends CharSequence> elements) {}
 ```
 
-
 大小写转换，locale 对象用于指明本地语言的转换规则。
 ```java
 public String toLowerCase(Locale locale) {}
@@ -476,20 +468,36 @@ public static String valueOf(double d) {
 public native String intern();
 ```
 
-例：
+例1：
+
 ```java
 String s = new String("abc");
 String s1 = "abc";
-String s2 = new String("abc");
-
-System.out.println(s == s1.intern()); // false
-System.out.println(s == s2.intern()); // false
-System.out.println(s1 == s2.intern());// true
+// true
+System.out.println(s1 == s.intern());
 ```
 
-初始化时，在堆内存创建了两个 "abc" 对象分别将地址赋给 s, s2, 同时在常量池创建了一个对象 "abc", 地址赋给了 s1。
+一种解释：
+执行 `new String("abc")` 会在堆内存和常量池分别创建一个 "abc" 对象。执行  `String s1 = "abc";` 发现常量池有 对应的对象，直接返回常量池的地址。
+执行 `intern()` 会到常量池中找。返回常量池中的 `abc` 的地址，和 s1相同。
 
-执行 intern() 会到常量池中找，所以在上述代码中, 其实 `s1.intern(), s2.intern()` 都指向了常量池中的 `s1`。
+例2：
+
+```java
+String str2 = new String("1") + new String("2");
+String str3 = new String("1") + new String("2");
+
+str2.intern();
+
+String str1 = "12";
+
+// false
+System.out.println(str3 == str1);
+// true
+System.out.println(str2 == str1);
+```
+
+一种解释：执行 `str2.intern();` 时，发现常量池没有 `12` 这个对象，直接把堆内存的 str2 对象放进常量池了。 所以有 `str2 == str1` 。
 
 ### 参考
 
