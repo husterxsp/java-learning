@@ -2,11 +2,11 @@
 
 1. [下载](https://www.apache.org/dyn/closer.cgi?path=rocketmq/4.3.0/rocketmq-all-4.3.0-bin-release.zip)
 
-在 ~/.bash_profile 配置
+在 ~/.bashrc 配置
 
 `export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home`
 
-并使之生效 `source ~/.bash_profile`。
+并使之生效 `source ~/.bashrc`。
 
 2. 启动 nameserver
 
@@ -42,6 +42,20 @@ sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
 ```bash
 sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
 ```
+
+也可以直接看给的官方的源代码的demo: 
+
+rocketmq-all-4.3.0/example/src/main/java/org/apache/rocketmq/example/quickstart/Consumer.java
+rocketmq-all-4.3.0/example/src/main/java/org/apache/rocketmq/example/quickstart/Producer.java
+
+需要修改代码加上 nameserver 的地址，再运行。
+
+```java
+consumer.setNamesrvAddr("127.0.0.1:9876");
+
+producer.setNamesrvAddr("127.0.0.1:9876");
+```
+
 
 5. 关闭server
 
