@@ -137,7 +137,7 @@ public class CallableDemo {
         ExecutorService executorService = Executors.newCachedThreadPool();
         List<Future<String>> resultList = new ArrayList<>();
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100; i++) {
             //使用ExecutorService执行Callable类型的任务，并将结果保存在future变量中
             Future<String> future = executorService.submit(new TaskWithResult(i));
             //将任务执行结果存储到List中
@@ -176,16 +176,47 @@ class TaskWithResult implements Callable<String> {
      */
     @Override
     public String call() throws Exception {
-        System.out.println("call()方法被自动调用！！！    " + Thread.currentThread().getName());
+        System.out.println("call()方法被自动调用！ " + Thread.currentThread().getName());
 
         Thread.sleep(10000);
         //该返回结果将被Future的get方法得到
-        return "call()方法被自动调用，任务返回的结果是：" + id + "    " + Thread.currentThread().getName();
+        return "call()方法被自动调用，任务返回的结果是：" + id + " " + Thread.currentThread().getName();
     }
 }
 ```
 
 `submit` 之后，`call` 方法就会执行，并在执行完之后将结果返回，通过 `get()` 方法获取。`isDone()` 方法有没有必要？因为即使不用 isDone 检查，get 方法也会一直阻塞知道获取结果的。
+
+
+
+需要注意，看以下源代码可知，submit方法其实也可以传入 Runnable 对象，只不过返回值是 null，或者可以一开始传入一个值用于返回。
+
+
+
+```java
+public abstract class AbstractExecutorService implements ExecutorService {
+	public <T> Future<T> submit(Callable<T> task) {
+        if (task == null) throw new NullPointerException();
+        RunnableFuture<T> ftask = newTaskFor(task);
+        execute(ftask);
+        return ftask;
+    }
+    public Future<?> submit(Runnable task) {
+        if (task == null) throw new NullPointerException();
+        RunnableFuture<Void> ftask = newTaskFor(task, null);
+        execute(ftask);
+        return ftask;
+    }
+	public <T> Future<T> submit(Runnable task, T result) {
+        if (task == null) throw new NullPointerException();
+        RunnableFuture<T> ftask = newTaskFor(task, result);
+        execute(ftask);
+        return ftask;
+    }
+}
+```
+
+
 
 newCachedThreadPool 会先检查是否有空闲的线程，有的话重用，没有则创建新的。
 

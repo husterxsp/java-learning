@@ -385,7 +385,7 @@ private class Itr implements Iterator<E> {
 
 如下图所示，ListIterator 继承自 Iterator，并且实现了 ListIterator 接口 ，所以 ListIterator 也就比 Iterator 多了一些方法。
 
-![012-01](/Users/xushaopeng/Desktop/Java/java-learning/weekly/img/012-01.png)
+![012-01](./img/012-01.png)
 
 ## 参考
 

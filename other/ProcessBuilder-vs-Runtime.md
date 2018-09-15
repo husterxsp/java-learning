@@ -1,7 +1,5 @@
 ## ProcessBuilder 和 Runtime 的区别
 
-
-
 Runtime是java1.0就有的API，ProcessBuilder是1.5才添加，但是目前看源代码，Runtime的内部实现其实就是用的ProcessBuilder。
 
 ### Runtime
@@ -109,7 +107,7 @@ Process process = new ProcessBuilder("javac", "HelloWorld.java").start();
 - Runtime.exec()可接受一个单独的字符串，这个字符串是通过空格来分隔可执行命令程序和参数的；也可以接受字符串数组参数。
 
 
-- ProcessBuilder的构造函数是一个字符串列表（`List<String>`）或者 多个字符串。列表中第一个参数是可执行命令程序，其他的是命令行执行是需要的参数。 
+- ProcessBuilder的构造函数是一个字符串列表（`List<String>`）或者 多个字符串。列表中第一个参数是可执行命令程序，其他的是命令行执行是需要的参数。
 
 
 
@@ -156,8 +154,3 @@ public class Test {
 
 - http://desert3.iteye.com/blog/1596020
 - http://www.hollischuang.com/archives/1383
-
-
-
-
-
