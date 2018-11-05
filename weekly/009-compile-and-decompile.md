@@ -95,6 +95,86 @@ public class test.Hello {
           ...
 ```
 
+
+
+如果使用 `-v  -verbose ` 选项，则输出更详细的信息，如下所示。
+
+```java
+ Last modified 2018-9-30; size 848 bytes
+  MD5 checksum bff12735bbe633433a201b5a0ac13b87
+  Compiled from "Hello.java"
+public class test.Hello
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #9.#28         // java/lang/Object."<init>":()V
+   #2 = String             #29            // world
+   #3 = Fieldref           #30.#31        // java/lang/System.out:Ljava/io/PrintStream;
+   #4 = Methodref          #32.#33        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #5 = Methodref          #34.#35        // java/lang/String.hashCode:()I
+   #6 = String             #10            // hello
+   #7 = Methodref          #34.#36        // java/lang/String.equals:(Ljava/lang/Object;)Z
+   #8 = Class              #37            // test/Hello
+   #9 = Class              #38            // java/lang/Object
+  #10 = Utf8               hello
+  ···
+  {
+  public test.Hello();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 3: 0
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0       5     0  this   Ltest/Hello;
+···
+public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=4, args_size=1
+         0: ldc           #2                  // String world
+         2: astore_1
+         3: getstatic     #3                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         6: aload_1
+         7: invokevirtual #4                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+···
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0     119     0  args   [Ljava/lang/String;
+            3     116     1   str   Ljava/lang/String;
+      StackMapTable: number_of_entries = 6
+        frame_type = 254 /* append */
+          offset_delta = 44
+          locals = [ class java/lang/String, class java/lang/String, int ]
+        frame_type = 13 /* same */
+        frame_type = 10 /* same */
+        frame_type = 26 /* same */
+        frame_type = 10 /* same */
+        frame_type = 249 /* chop */
+          offset_delta = 10
+```
+
+主要如果要显示  `LocalVariableTable` 则需要在javac的时候加上 `-g` 参数，即编译的时候加上各种调试信息。[参考](https://stackoverflow.com/questions/31777957/javap-c-v-l-s-helloworld-class-doesnt-show-localvariabletable)
+
+可以看到编译之后，会生成一个无参的构造函数。
+
+args_size 包含一个默认的 this 参数的。
+
+
+
+https://www.jianshu.com/p/c8928d98cb8e
+
+
+
+
+
 javap文档：https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javap.html
 
 #### jad
