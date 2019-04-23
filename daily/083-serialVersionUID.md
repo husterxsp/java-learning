@@ -9,3 +9,4 @@
 ### 参考
 
 - [对象序列化为何要定义serialVersionUID - iteye.com](http://lenjey.iteye.com/blog/513736)
+
