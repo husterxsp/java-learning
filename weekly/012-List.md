@@ -34,6 +34,39 @@ public class TreeSet<E> extends AbstractSet<E>
 
 - vector，线程安全的可变数组。java 1.0 的容器，现在已经过时，不应该使用。在底层数组容量不足时，ArrayList会将容量扩容为原来的1.5倍。而Vector支持在创建的时候主动声明扩容时增加的容量的大小，通过`Vector(int initialCapacity, int capacityIncrement)` 构造函数实现。如果没有声明，或者capacityIncrement <= 0，那么默认扩容为原来的2倍。
 
+  - 方法加synchronized
+
+### ArrayList扩容
+
+```java
+// 默认容量10
+private static final int DEFAULT_CAPACITY = 10;
+// 底层用来存数据的数组
+transient Object[] elementData; 
+
+private void ensureExplicitCapacity(int minCapacity) {
+    modCount++;
+
+    // overflow-conscious code
+    if (minCapacity - elementData.length > 0)
+        grow(minCapacity);
+}
+private void grow(int minCapacity) {
+    // overflow-conscious code
+    int oldCapacity = elementData.length;
+  	// 扩容方式，增加原来容量的一半
+    int newCapacity = oldCapacity + (oldCapacity >> 1);
+    if (newCapacity - minCapacity < 0)
+        newCapacity = minCapacity;
+    if (newCapacity - MAX_ARRAY_SIZE > 0)
+        newCapacity = hugeCapacity(minCapacity);
+    // minCapacity is usually close to size, so this is a win:
+    elementData = Arrays.copyOf(elementData, newCapacity);
+}
+```
+
+默认初始容量是10，当添加了10个元素的时候就会开始扩容。
+
 ### Collections.synchronizedList()
 
 Collections类里的静态工具方法。可以将不安全的 List 转为安全的 List。
